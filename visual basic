@@ -1,0 +1,57 @@
+Public Class Form1
+
+    Private Sub ReadFileButton_Click(sender As Object, e As EventArgs) Handles ReadFileButton.Click
+        ' membuka dialog untuk memilih file yang akan dibaca
+        Dim openFileDialog As New OpenFileDialog()
+        openFileDialog.Filter = "Text Files (*.txt)|*.txt"
+        If openFileDialog.ShowDialog() = DialogResult.OK Then
+            ' membaca file ke dalam array data
+            Dim data() As String = My.Computer.FileSystem.ReadAllText(openFileDialog.FileName).Split(vbNewLine)
+
+            ' menampilkan data pada textbox
+            For Each line As String In data
+                InputTextBox.Text += line + vbNewLine
+            Next
+        End If
+    End Sub
+
+    Private Sub AnalyzeButton_Click(sender As Object, e As EventArgs) Handles AnalyzeButton.Click
+        ' mengambil data dari textbox dan memisahkannya menjadi array
+        Dim data() As String = InputTextBox.Text.Split(vbNewLine)
+
+        ' variabel untuk menyimpan informasi keuangan
+        Dim totalIncome As Double = 0
+        Dim totalExpense As Double = 0
+        Dim months As Integer = 0
+
+        ' menghitung informasi keuangan
+        For Each line As String In data
+            ' memeriksa apakah baris mengandung informasi keuangan
+            If line.StartsWith("Month") Then
+                ' mengambil informasi keuangan dari baris
+                Dim parts() As String = line.Split(vbTab)
+                Dim income As Double = parts(1)
+                Dim expense As Double = parts(2)
+
+                ' menghitung total pendapatan dan pengeluaran
+                totalIncome += income
+                totalExpense += expense
+
+                ' menghitung jumlah bulan
+                months += 1
+            End If
+        Next
+
+        ' menghitung rata-rata keuangan per bulan
+        Dim averageIncome As Double = totalIncome / months
+        Dim averageExpense As Double = totalExpense / months
+
+        ' menentukan apakah perusahaan mengalami kenaikan atau penurunan pendapatan
+        Dim incomeChange As String
+        If totalIncome > averageIncome Then
+            incomeChange = "meningkat"
+        ElseIf totalIncome < averageIncome Then
+            incomeChange = "menurun"
+        Else
+            incomeChange = "tidak berubah"
+        End If
